@@ -29,7 +29,7 @@
 
 ---
 
-BackupX is a self-hosted backup management platform for **Linux / macOS servers**. Through an enterprise-grade Web console, you can easily configure directory backups, database backups, and securely store backup files to Alibaba Cloud OSS, Tencent Cloud COS, Qiniu Cloud Kodo, Google Drive, S3-compatible storage, WebDAV, or local disk.
+BackupX is a self-hosted backup management platform for **Linux / macOS servers**. Through an enterprise-grade Web console, you can easily configure directory backups, database backups, and securely store backup files to Alibaba Cloud OSS, Tencent Cloud COS, Qiniu Cloud Kodo, Google Drive, S3-compatible storage, WebDAV, FTP/FTPS, or local disk.
 
 Supports **multi-node cluster management** for unified control of backup tasks across different servers.
 
@@ -68,6 +68,7 @@ Supports **multi-node cluster management** for unified control of backup tasks a
 - **MySQL** — Via native `mysqldump` tool
 - **SQLite** — Safe file copy
 - **PostgreSQL** — Via native `pg_dump` tool
+- **SAP HANA** — Via native `hdbsql` tool (multi-tenant database support)
 
 ### ☁️ Multi-Cloud Storage Backends
 | Provider | Type | Description |
@@ -78,6 +79,7 @@ Supports **multi-node cluster management** for unified control of backup tasks a
 | 🌍 **S3 Compatible** | `s3` | AWS S3 / MinIO / Cloudflare R2, etc. |
 | 🌍 **Google Drive** | `google_drive` | Full OAuth 2.0 flow |
 | 🌍 **WebDAV** | `webdav` | Nextcloud / Nutstore, etc. |
+| 🌍 **FTP / FTPS** | `ftp` | Standard FTP protocol with Explicit TLS support |
 | 💾 **Local Disk** | `local_disk` | Backup to local server directory |
 
 > Chinese cloud providers only require **Region** and **AccessKey** — the system auto-assembles the endpoint. Powered by the S3 engine under the hood with zero extra dependencies.
@@ -189,6 +191,7 @@ log:
 │  │Scheduler │             │  │ S3 Compatible    │  ││
 │  └──────────┘             │  │ Google Drive     │  ││
 │                           │  │ WebDAV           │  ││
+│                           │  │ FTP / FTPS       │  ││
 │  ┌──────────┐             │  │ Local Disk       │  ││
 │  │ Notify   │             │  └─────────────────┘  ││
 │  │ Module   │             └───────────────────────┘│
@@ -212,7 +215,7 @@ log:
 |-----------|-----------|
 | **Backend** | Go · Gin · GORM · SQLite · robfig/cron |
 | **Frontend** | React 18 · TypeScript · ArcoDesign · Vite · Zustand · ECharts |
-| **Storage** | AWS SDK v2 (S3/OSS/COS/Kodo) · Google Drive API v3 · gowebdav |
+| **Storage** | AWS SDK v2 (S3/OSS/COS/Kodo) · Google Drive API v3 · gowebdav · jlaffaye/ftp |
 | **Security** | JWT · bcrypt · AES-256-GCM |
 | **Logging** | zap + lumberjack (auto-rotation) |
 
@@ -250,7 +253,7 @@ BackupX/
 │   ├── internal/
 │   │   ├── app/                   #   App assembly (DI)
 │   │   ├── apperror/              #   Unified error types
-│   │   ├── backup/                #   Backup engine (file/mysql/sqlite/pgsql)
+│   │   ├── backup/                #   Backup engine (file/mysql/sqlite/pgsql/saphana)
 │   │   │   └── retention/         #     Retention policy
 │   │   ├── config/                #   Config loading (viper)
 │   │   ├── database/              #   Database init + migrations
@@ -273,6 +276,7 @@ BackupX/
 │   │       ├── webdav/            #     WebDAV core
 │   │       ├── webdavprovider/    #     WebDAV Provider helper
 │   │       ├── localdisk/         #     Local disk
+│   │       ├── ftp/               #     FTP / FTPS
 │   │       └── codec/             #     Config codec
 │   └── pkg/                       #   Utilities (compress/crypto/response)
 ├── web/                           # React frontend
