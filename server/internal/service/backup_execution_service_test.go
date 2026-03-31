@@ -15,7 +15,7 @@ import (
 	"backupx/server/internal/repository"
 	"backupx/server/internal/storage"
 	"backupx/server/internal/storage/codec"
-	"backupx/server/internal/storage/localdisk"
+	storageRclone "backupx/server/internal/storage/rclone"
 )
 
 func newExecutionTestServices(t *testing.T) (*BackupExecutionService, *BackupRecordService, repository.BackupTaskRepository, repository.StorageTargetRepository, repository.BackupRecordRepository, string, string) {
@@ -53,7 +53,7 @@ func newExecutionTestServices(t *testing.T) (*BackupExecutionService, *BackupRec
 	}
 	logHub := backup.NewLogHub()
 	runnerRegistry := backup.NewRegistry(backup.NewFileRunner(), backup.NewMySQLRunner(nil), backup.NewSQLiteRunner(), backup.NewPostgreSQLRunner(nil))
-	storageRegistry := storage.NewRegistry(localdisk.NewFactory())
+	storageRegistry := storage.NewRegistry(storageRclone.NewLocalDiskFactory())
 	retentionService := backupretention.NewService(records)
 	tempDir := filepath.Join(baseDir, "tmp")
 	if err := os.MkdirAll(tempDir, 0o755); err != nil {
