@@ -20,14 +20,7 @@ import (
 	"backupx/server/internal/service"
 	"backupx/server/internal/storage"
 	"backupx/server/internal/storage/codec"
-	"backupx/server/internal/storage/googledrive"
-	"backupx/server/internal/storage/localdisk"
-	storageAliyun "backupx/server/internal/storage/aliyun"
-	storageFTP "backupx/server/internal/storage/ftp"
-	storageTencent "backupx/server/internal/storage/tencent"
-	storageQiniu "backupx/server/internal/storage/qiniu"
-	storageS3 "backupx/server/internal/storage/s3"
-	storageWebDAV "backupx/server/internal/storage/webdav"
+	storageRclone "backupx/server/internal/storage/rclone"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -70,14 +63,14 @@ func New(ctx context.Context, cfg config.Config, version string) (*Application, 
 	systemService := service.NewSystemService(cfg, version, time.Now().UTC())
 	configCipher := codec.NewConfigCipher(resolvedSecurity.EncryptionKey)
 	storageRegistry := storage.NewRegistry(
-		localdisk.NewFactory(),
-		storageS3.NewFactory(),
-		storageWebDAV.NewFactory(),
-		googledrive.NewFactory(),
-		storageAliyun.NewFactory(),
-		storageTencent.NewFactory(),
-		storageQiniu.NewFactory(),
-		storageFTP.NewFactory(),
+		storageRclone.NewLocalDiskFactory(),
+		storageRclone.NewS3Factory(),
+		storageRclone.NewWebDAVFactory(),
+		storageRclone.NewGoogleDriveFactory(),
+		storageRclone.NewAliyunOSSFactory(),
+		storageRclone.NewTencentCOSFactory(),
+		storageRclone.NewQiniuKodoFactory(),
+		storageRclone.NewFTPFactory(),
 	)
 	storageTargetService := service.NewStorageTargetService(storageTargetRepo, oauthSessionRepo, storageRegistry, configCipher)
 	storageTargetService.SetBackupTaskRepository(backupTaskRepo)
